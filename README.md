@@ -13,6 +13,7 @@ Group repository.
 | [`canonicalization`](canonicalization/) | Inconsistent URI equality merges issuer-distinct workload identities | `ALLOW` | `DENY` |
 | [`issuer-origin-binding`](issuer-origin-binding/) | An accepted issuer asserts a privileged identity outside its authorized origin | `ALLOW` | `DENY` |
 | [`hierarchical-matching`](hierarchical-matching/) | Raw prefix and path-only policies expand hierarchical authorization | `ALLOW` | `DENY` |
+| [`uniqueness-and-reuse`](uniqueness-and-reuse/) | Local allocation and intentional reuse merge unrelated security principals | `ACCEPT` / `ALLOW` | `REJECT` / `DENY` |
 
 ## Design
 
@@ -43,6 +44,10 @@ python3 -m unittest -v test_issuer_origin_binding_counterexample.py
 cd ../hierarchical-matching
 python3 hierarchical_matching_counterexample.py
 python3 -m unittest -v test_hierarchical_matching_counterexample.py
+
+cd ../uniqueness-and-reuse
+python3 identifier_uniqueness_and_reuse_counterexample.py
+python3 -m unittest -v test_identifier_uniqueness_and_reuse_counterexample.py
 ```
 
 ## Related specification

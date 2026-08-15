@@ -23,3 +23,8 @@ jobs:
       - name: Run issuer-to-origin regression tests
         working-directory: issuer-origin-binding
         run: python3 -m unittest -v test_issuer_origin_binding_counterexample.py
+      - name: Run hierarchical-matching counterexamples
+        run: python3 hierarchical-matching/hierarchical_matching_counterexample.py
+      - name: Run hierarchical-matching regression tests
+        working-directory: hierarchical-matching
+        run: python3 -m unittest -v test_hierarchical_matching_counterexample.py

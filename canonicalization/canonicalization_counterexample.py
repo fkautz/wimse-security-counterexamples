@@ -7,13 +7,12 @@ comparison from merging two issuer-distinct subjects.
 """
 
 from dataclasses import dataclass
-import posixpath
 import re
 from urllib.parse import unquote, urlsplit
 
 
 CANONICAL_SUBJECT = "wimse://trust.example/service/payment"
-NON_CANONICAL_SUBJECT = "WIMSE://TRUST.EXAMPLE/service/%70ayment"
+NON_CANONICAL_SUBJECT = "wimse://trust.example/service/%70ayment"
 
 _AUTHORITY = re.compile(r"[a-z0-9._-]+")
 _SEGMENT = re.compile(r"[A-Za-z0-9._~-]+")
@@ -27,10 +26,9 @@ class ValidatedCredential:
 
 
 def weak_identity_key(subject: str) -> str:
-    """Approximate a consumer that applies generic URI normalization."""
+    """Approximate a consumer that decodes a URI before authorization."""
     parsed = urlsplit(subject)
-    path = posixpath.normpath(unquote(parsed.path))
-    return f"{parsed.scheme.lower()}://{parsed.hostname.lower()}{path}"
+    return f"{parsed.scheme}://{parsed.netloc}{unquote(parsed.path)}"
 
 
 def is_canonical_wimse_identifier(subject: str) -> bool:

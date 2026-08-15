@@ -15,11 +15,10 @@ The issuer treats these strings as distinct:
 
 ```text
 wimse://trust.example/service/payment
-WIMSE://TRUST.EXAMPLE/service/%70ayment
+wimse://trust.example/service/%70ayment
 ```
 
-A consumer that folds scheme and host case and decodes percent-encoded
-unreserved characters reduces both to:
+A consumer that decodes percent-encoded unreserved characters reduces both to:
 
 ```text
 wimse://trust.example/service/payment

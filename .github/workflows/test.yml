@@ -18,3 +18,8 @@ jobs:
       - name: Run regression tests
         working-directory: canonicalization
         run: python3 -m unittest -v test_canonicalization_counterexample.py
+      - name: Run issuer-to-origin counterexamples
+        run: python3 issuer-origin-binding/issuer_origin_binding_counterexample.py
+      - name: Run issuer-to-origin regression tests
+        working-directory: issuer-origin-binding
+        run: python3 -m unittest -v test_issuer_origin_binding_counterexample.py

@@ -65,24 +65,41 @@ class HierarchicalMatchingCounterexampleTest(unittest.TestCase):
             )
         )
 
+    def test_empty_and_root_policies_fail_closed_by_default(self) -> None:
+        for policy in (
+            counterexample.EMPTY_PATH_POLICY,
+            counterexample.ROOT_PATH_POLICY,
+        ):
+            with self.subTest(policy=policy.root_identifier):
+                self.assertTrue(
+                    counterexample.weak_raw_prefix_allows(
+                        policy,
+                        counterexample.AUTHORIZED_DESCENDANT,
+                    )
+                )
+                self.assertFalse(
+                    counterexample.strict_segment_policy_allows(
+                        policy,
+                        counterexample.AUTHORIZED_DESCENDANT,
+                    )
+                )
+
     def test_origin_wide_policy_requires_explicit_grant(self) -> None:
-        implicit = counterexample.HierarchicalPolicy("wimse://trust.example/")
-        explicit = counterexample.HierarchicalPolicy(
-            "wimse://trust.example/",
-            allow_entire_origin=True,
-        )
-        self.assertFalse(
-            counterexample.strict_segment_policy_allows(
-                implicit,
-                counterexample.AUTHORIZED_DESCENDANT,
-            )
-        )
-        self.assertTrue(
-            counterexample.strict_segment_policy_allows(
-                explicit,
-                counterexample.AUTHORIZED_DESCENDANT,
-            )
-        )
+        for policy in (
+            counterexample.EMPTY_PATH_POLICY,
+            counterexample.ROOT_PATH_POLICY,
+        ):
+            with self.subTest(policy=policy.root_identifier):
+                explicit = counterexample.HierarchicalPolicy(
+                    policy.root_identifier,
+                    allow_entire_origin=True,
+                )
+                self.assertTrue(
+                    counterexample.strict_segment_policy_allows(
+                        explicit,
+                        counterexample.AUTHORIZED_DESCENDANT,
+                    )
+                )
 
 
 if __name__ == "__main__":

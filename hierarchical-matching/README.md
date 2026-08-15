@@ -74,6 +74,20 @@ wimse://attacker.example/service/pay/worker
 A path-only prefix check returns `ALLOW` even though the subject belongs to a
 different origin.
 
+### Empty and root policies
+
+An empty or root path has no parsed path segments. The empty sequence is a
+prefix of every path sequence unless the implementation explicitly fails
+closed:
+
+| Policy | Policy segments | Presented segments | Fail-open default (incorrect) | Fail-closed default (correct) |
+| --- | --- | --- | --- | --- |
+| `wimse://trust.example` | `[]` | `["service", "pay", "worker"]` | `ALLOW` | `DENY` |
+| `wimse://trust.example/` | `[]` | `["service", "pay", "worker"]` | `ALLOW` | `DENY` |
+
+An explicitly configured origin-wide grant may return `ALLOW`. Without that
+explicit grant, `DENY` is correct.
+
 ## Run
 
 ```sh
@@ -103,6 +117,12 @@ origin_substitution.policy_enabled: true
 origin_substitution.same_origin: false
 origin_substitution.weak_policy: ALLOW
 origin_substitution.strict_policy: DENY
+empty_path.fail_open_policy: ALLOW
+empty_path.fail_closed_default: DENY
+empty_path.explicit_originwide: ALLOW
+root_path.fail_open_policy: ALLOW
+root_path.fail_closed_default: DENY
+root_path.explicit_originwide: ALLOW
 authorized_descendant.strict_policy: ALLOW
 disabled_policy.strict_policy: DENY
 security_result: raw prefix policies granted privileges outside the configured hierarchy

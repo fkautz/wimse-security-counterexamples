@@ -32,6 +32,8 @@ ENCODED_DOT_SEGMENT_ESCAPE = (
 )
 ORIGIN_SUBSTITUTION = "wimse://attacker.example/service/pay/worker"
 AUTHORIZED_DESCENDANT = "wimse://trust.example/service/pay/worker"
+EMPTY_PATH_POLICY = HierarchicalPolicy("wimse://trust.example")
+ROOT_PATH_POLICY = HierarchicalPolicy("wimse://trust.example/")
 
 
 def same_origin(left: str, right: str) -> bool:
@@ -146,6 +148,32 @@ def main() -> None:
     for case in ATTACK_CASES:
         print_result(case)
 
+    for name, policy in (
+        ("empty_path", EMPTY_PATH_POLICY),
+        ("root_path", ROOT_PATH_POLICY),
+    ):
+        fail_open = weak_raw_prefix_allows(policy, AUTHORIZED_DESCENDANT)
+        fail_closed = strict_segment_policy_allows(
+            policy,
+            AUTHORIZED_DESCENDANT,
+        )
+        explicit_originwide = strict_segment_policy_allows(
+            HierarchicalPolicy(
+                policy.root_identifier,
+                allow_entire_origin=True,
+            ),
+            AUTHORIZED_DESCENDANT,
+        )
+        print(f"{name}.fail_open_policy: {'ALLOW' if fail_open else 'DENY'}")
+        print(
+            f"{name}.fail_closed_default: "
+            f"{'ALLOW' if fail_closed else 'DENY'}"
+        )
+        print(
+            f"{name}.explicit_originwide: "
+            f"{'ALLOW' if explicit_originwide else 'DENY'}"
+        )
+
     authorized = strict_segment_policy_allows(POLICY, AUTHORIZED_DESCENDANT)
     disabled = strict_segment_policy_allows(
         HierarchicalPolicy(POLICY_ROOT, enabled=False),
@@ -162,7 +190,19 @@ def main() -> None:
         weak_policy_allows(case) and not strict_policy_allows(case)
         for case in ATTACK_CASES
     )
-    if not reproduced or not authorized or disabled:
+    originwide_controls = all(
+        weak_raw_prefix_allows(policy, AUTHORIZED_DESCENDANT)
+        and not strict_segment_policy_allows(policy, AUTHORIZED_DESCENDANT)
+        and strict_segment_policy_allows(
+            HierarchicalPolicy(
+                policy.root_identifier,
+                allow_entire_origin=True,
+            ),
+            AUTHORIZED_DESCENDANT,
+        )
+        for policy in (EMPTY_PATH_POLICY, ROOT_PATH_POLICY)
+    )
+    if not reproduced or not originwide_controls or not authorized or disabled:
         raise SystemExit("counterexamples did not reproduce")
 
 
